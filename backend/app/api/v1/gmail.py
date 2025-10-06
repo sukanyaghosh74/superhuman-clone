@@ -29,3 +29,7 @@ async def delete_message(message_id: str, service: GmailService = Depends(get_se
 @router.get("/labels")
 async def list_labels(service: GmailService = Depends(get_service)):
     return await service.list_labels()
+
+@router.post("/messages/{message_id}/archive")
+async def archive_message(message_id: str, service: GmailService = Depends(get_service)):
+    return await service.archive_message(message_id)

@@ -87,3 +87,13 @@ class GmailService:
         def _labels():
             return self.service.users().labels().list(userId="me").execute()
         return await asyncio.to_thread(_labels)
+
+    async def modify_message_labels(self, message_id: str, add: Optional[List[str]] = None, remove: Optional[List[str]] = None):
+        body = {"addLabelIds": add or [], "removeLabelIds": remove or []}
+        def _modify():
+            return self.service.users().messages().modify(userId="me", id=message_id, body=body).execute()
+        return await asyncio.to_thread(_modify)
+
+    async def archive_message(self, message_id: str):
+        # Archiving removes the INBOX label
+        return await self.modify_message_labels(message_id, add=None, remove=["INBOX"]) 

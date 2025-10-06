@@ -9,6 +9,14 @@ export default function Compose() {
   const [contacts, setContacts] = useState<string[]>([])
 
   useEffect(() => {
+    const u = new URL(window.location.href)
+    const qsSubject = u.searchParams.get('subject')
+    const qsBody = u.searchParams.get('body')
+    if (qsSubject) setSubject(qsSubject)
+    if (qsBody) setBody(qsBody)
+  }, [])
+
+  useEffect(() => {
     (async () => {
       const msgs = await db.messages.limit(200).toArray()
       const guesses = new Set<string>()

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { listMessages, deleteMessage } from '../../utils/api'
+import { listMessages, deleteMessage, archiveMessage } from '../../utils/api'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { Link } from 'react-router-dom'
 
@@ -27,11 +27,24 @@ export default function Inbox() {
     setMessages((prev) => prev.filter((x) => x.id !== m.id))
     setIdx((i) => Math.max(0, i - 1))
   }, [messages, idx])
+  useHotkeys('e', async () => {
+    const m = messages[idx]
+    if (!m) return
+    await archiveMessage(m.id)
+    setMessages((prev) => prev.filter((x) => x.id !== m.id))
+    setIdx((i) => Math.max(0, i - 1))
+  }, [messages, idx])
 
   const suggestions = useMemo(() => {
     if (!q) return [] as string[]
-    const ids = messages.map((m) => m.id)
-    return ids.filter((id) => id.includes(q)).slice(0, 5)
+    const scored = messages.map((m) => {
+      const id = String(m.id)
+      let score = 0
+      if (id.startsWith(q)) score += 3
+      if (id.includes(q)) score += 1
+      return { id, score }
+    })
+    return scored.sort((a, b) => b.score - a.score).slice(0, 5).map((s) => s.id)
   }, [q, messages])
 
   return (
@@ -59,6 +72,9 @@ export default function Inbox() {
             {m.id}
           </Link>
         ))}
+      </div>
+      <div style={{ marginTop: 12, color: '#94a3b8' }}>
+        Hotkeys: j/k navigate, e archive, del delete, c compose
       </div>
     </div>
   )

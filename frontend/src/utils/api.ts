@@ -38,6 +38,12 @@ export async function deleteMessage(id: string) {
   return data
 }
 
+export async function archiveMessage(id: string) {
+  const { data } = await axios.post(`/gmail/messages/${id}/archive`)
+  await db.messages.delete(id)
+  return data
+}
+
 export async function listLabels() {
   const { data } = await axios.get('/gmail/labels')
   return data
