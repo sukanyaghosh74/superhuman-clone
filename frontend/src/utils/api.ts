@@ -1,15 +1,31 @@
 import axios from 'axios'
+import { db } from './db'
 
 export async function listMessages(q?: string) {
   const params: any = {}
   if (q) params.q = q
-  const { data } = await axios.get('/gmail/messages', { params })
-  return data
+  try {
+    const { data } = await axios.get('/gmail/messages', { params })
+    const messages = data?.messages ?? []
+    await db.messages.bulkPut(messages.map((m: any) => ({ id: m.id, threadId: m.threadId, updatedAt: Date.now() })))
+    return data
+  } catch (e) {
+    // offline fallback - return cached minimal list
+    const cached = await db.messages.orderBy('updatedAt').reverse().limit(50).toArray()
+    return { messages: cached }
+  }
 }
 
 export async function getThread(id: string) {
-  const { data } = await axios.get(`/gmail/threads/${id}`)
-  return data
+  try {
+    const { data } = await axios.get(`/gmail/threads/${id}`)
+    await db.threads.put({ id, payload: data, updatedAt: Date.now() })
+    return data
+  } catch (e) {
+    const cached = await db.threads.get(id)
+    if (cached) return cached.payload
+    throw e
+  }
 }
 
 export async function sendEmail(payload: { to: string; subject: string; body: string; cc?: string[] }) {

@@ -3,6 +3,12 @@ import Inbox from './pages/Inbox'
 import Thread from './pages/Thread'
 import Compose from './pages/Compose'
 
+async function startLogin() {
+  const res = await fetch('/auth/login')
+  const data = await res.json()
+  if (data.auth_url) window.location.href = data.auth_url
+}
+
 export default function App() {
   const navigate = useNavigate()
   return (
@@ -14,7 +20,7 @@ export default function App() {
           <Link to="/sent">Sent</Link>
           <Link to="/drafts">Drafts</Link>
           <button onClick={() => navigate('/compose')}>Compose (c)</button>
-          <a href="/auth/login">Login with Google</a>
+          <button onClick={startLogin}>Login with Google</button>
         </div>
       </nav>
       <div style={{ flex: 1, padding: 16 }}>
