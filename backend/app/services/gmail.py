@@ -82,3 +82,8 @@ class GmailService:
             return self.service.users().messages().delete(userId="me", id=message_id).execute()
         await asyncio.to_thread(_del)
         return {"status": "deleted", "id": message_id}
+
+    async def list_labels(self):
+        def _labels():
+            return self.service.users().labels().list(userId="me").execute()
+        return await asyncio.to_thread(_labels)

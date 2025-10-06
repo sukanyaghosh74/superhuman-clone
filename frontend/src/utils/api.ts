@@ -10,7 +10,6 @@ export async function listMessages(q?: string) {
     await db.messages.bulkPut(messages.map((m: any) => ({ id: m.id, threadId: m.threadId, updatedAt: Date.now() })))
     return data
   } catch (e) {
-    // offline fallback - return cached minimal list
     const cached = await db.messages.orderBy('updatedAt').reverse().limit(50).toArray()
     return { messages: cached }
   }
@@ -30,6 +29,17 @@ export async function getThread(id: string) {
 
 export async function sendEmail(payload: { to: string; subject: string; body: string; cc?: string[] }) {
   const { data } = await axios.post('/gmail/send', payload)
+  return data
+}
+
+export async function deleteMessage(id: string) {
+  const { data } = await axios.delete(`/gmail/messages/${id}`)
+  await db.messages.delete(id)
+  return data
+}
+
+export async function listLabels() {
+  const { data } = await axios.get('/gmail/labels')
   return data
 }
 

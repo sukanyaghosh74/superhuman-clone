@@ -25,3 +25,7 @@ async def send_email(payload: SendEmailRequest, service: GmailService = Depends(
 @router.delete("/messages/{message_id}")
 async def delete_message(message_id: str, service: GmailService = Depends(get_service)):
     return await service.delete_message(message_id)
+
+@router.get("/labels")
+async def list_labels(service: GmailService = Depends(get_service)):
+    return await service.list_labels()
