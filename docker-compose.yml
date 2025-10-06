@@ -1,0 +1,38 @@
+version: "3.9"
+services:
+  backend:
+    build: ./backend
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./backend/app/data:/app/app/data
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    env_file:
+      - .env
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: superhuman
+      POSTGRES_PASSWORD: superhuman
+      POSTGRES_DB: superhuman
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

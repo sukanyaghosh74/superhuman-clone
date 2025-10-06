@@ -1,0 +1,46 @@
+# Node
+node_modules/
+.dist/
+.build/
+dist/
+build/
+.cache/
+.vite/
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+.env/
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Coverage and reports
+coverage/
+.coverage
+pytest_cache/
+
+# SQLite DBs
+backend/app/data/*.db
+backend/app/data/*.sqlite
+backend/app/data/*.sqlite3
+
+# Generated
+frontend/.parcel-cache/
+frontend/.next/
+frontend/.turbo/
+
+# Build artifacts
+frontend/build/
+frontend/dist/
+backend/.mypy_cache/
