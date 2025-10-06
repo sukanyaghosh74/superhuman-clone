@@ -7,12 +7,22 @@ export default function Inbox() {
   const [q, setQ] = useState('')
   const [messages, setMessages] = useState<any[]>([])
   const [idx, setIdx] = useState(0)
+  const [suggestions, setSuggestions] = useState<string[]>([])
 
   useEffect(() => {
     const id = setTimeout(async () => {
       const data = await listMessages(q)
       setMessages(data?.messages ?? [])
       setIdx(0)
+      if (q) {
+        try {
+          const res = await fetch(`/search/suggest?q=${encodeURIComponent(q)}`)
+          const s = await res.json()
+          setSuggestions([...(s.emails || []), ...(s.contacts || [])].slice(0, 5))
+        } catch {}
+      } else {
+        setSuggestions([])
+      }
     }, 200)
     return () => clearTimeout(id)
   }, [q])
@@ -34,18 +44,6 @@ export default function Inbox() {
     setMessages((prev) => prev.filter((x) => x.id !== m.id))
     setIdx((i) => Math.max(0, i - 1))
   }, [messages, idx])
-
-  const suggestions = useMemo(() => {
-    if (!q) return [] as string[]
-    const scored = messages.map((m) => {
-      const id = String(m.id)
-      let score = 0
-      if (id.startsWith(q)) score += 3
-      if (id.includes(q)) score += 1
-      return { id, score }
-    })
-    return scored.sort((a, b) => b.score - a.score).slice(0, 5).map((s) => s.id)
-  }, [q, messages])
 
   return (
     <div>
